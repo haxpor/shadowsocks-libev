@@ -15,6 +15,7 @@
 #include <libcork/core/attributes.h>
 #include <libcork/core/byte-order.h>
 #include <libcork/core/types.h>
+#include <libcork/core/api.h>
 
 typedef struct {
     union {

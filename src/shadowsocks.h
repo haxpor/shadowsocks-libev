@@ -1,7 +1,7 @@
 /*
  * shadowsocks.h - Header files of library interfaces
  *
- * Copyright (C) 2013 - 2015, Max Lv <max.c.lv@gmail.com>
+ * Copyright (C) 2013 - 2016, Max Lv <max.c.lv@gmail.com>
  *
  * This file is part of the shadowsocks-libev.
  * shadowsocks-libev is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ typedef struct {
     /*  Optional, set NULL if not valid   */
     char *acl;            // file path to acl
     char *log;            // file path to log
+    int use_sys_log;            // file path to log
     int fast_open;        // enable tcp fast open
     int mode;             // enable udp relay
     int auth;             // enable one-time authentication
@@ -64,18 +65,20 @@ typedef struct {
 extern "C" {
 #endif
 
-/*
- * Create and start a shadowsocks local server.
- *
- * Calling this function will block the current thread forever if the server
- * starts successfully.
- *
- * Make sure start the server in a seperate process to avoid any potential
- * memory and socket leak.
- *
- * If failed, -1 is returned. Errors will output to the log file.
- */
-int start_ss_local_server(profile_t profile);
+    typedef void (*shadowsocks_cb) (int fd, void*);
+
+    /*
+     * Create and start a shadowsocks local server.
+     *
+     * Calling this function will block the current thread forever if the server
+     * starts successfully.
+     *
+     * Make sure start the server in a seperate process to avoid any potential
+     * memory and socket leak.
+     *
+     * If failed, -1 is returned. Errors will output to the log file.
+     */
+    int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data);
 
 #ifdef __cplusplus
 }
@@ -83,5 +86,7 @@ int start_ss_local_server(profile_t profile);
 
 // To stop the service on posix system, just kill the daemon process
 // kill(pid, SIGKILL);
+// Otherwise, If you start the service in a thread, you may need to send a signal SIGUSER1 to the thread.
+// pthread_kill(pthread_t, SIGUSR1);
 
 #endif // _SHADOWSOCKS_H

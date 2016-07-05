@@ -1436,7 +1436,7 @@ int main(int argc, char **argv)
 
 #else
 
-int start_ss_local_server(profile_t profile)
+int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
 {
     srand(time(NULL));
 
@@ -1517,6 +1517,8 @@ int start_ss_local_server(profile_t profile)
         return -1;
     }
     setnonblocking(listenfd);
+
+    cb(listenfd, data);
 
     listen_ctx.fd = listenfd;
 
