@@ -1,5 +1,7 @@
-
+#include <stdlib.h>
 #include "auth.h"
+#include "encrypt.h"
+#include "crc32.h"
 
 static int auth_simple_pack_unit_size = 2000;
 

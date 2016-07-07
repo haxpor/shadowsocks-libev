@@ -1,4 +1,6 @@
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "http_simple.h"
 
 typedef struct http_simple_local_data {

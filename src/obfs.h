@@ -26,6 +26,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#define OBFS_HMAC_SHA1_LEN 10
+
 typedef struct server_info {
     char host[64];
     uint16_t port;
@@ -77,5 +79,11 @@ void free_obfs_class(obfs_class *plugin);
 void set_server_info(obfs *self, server_info *server);
 obfs * new_obfs();
 void dispose_obfs(obfs *self);
+
+int get_head_size(char *plaindata, int size, int def_size);
+
+static uint64_t shift128plus_s[2];
+
+uint64_t xorshift128plus(void);
 
 #endif // _OBFS_H

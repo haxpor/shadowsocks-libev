@@ -88,7 +88,7 @@ static int enc_method;
 
 static struct cache *iv_cache;
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
 static void dump(char *tag, char *text, int len)
 {
     int i;
@@ -1013,7 +1013,7 @@ void cipher_context_set_iv(cipher_ctx_t *ctx, uint8_t *iv, size_t iv_len,
     }
 #endif
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
     dump("IV", (char *)iv, iv_len);
 #endif
 }
@@ -1199,7 +1199,7 @@ int ss_encrypt_all(buffer_t *plain, int method, int auth, size_t capacity)
             return -1;
         }
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
         dump("PLAIN", plain->array, plain->len);
         dump("CIPHER", cipher->array + iv_len, cipher->len);
 #endif
@@ -1274,7 +1274,7 @@ int ss_encrypt(buffer_t *plain, enc_ctx_t *ctx, size_t capacity)
             }
         }
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
         dump("PLAIN", plain->array, plain->len);
         dump("CIPHER", cipher->array + iv_len, cipher->len);
 #endif
@@ -1345,7 +1345,7 @@ int ss_decrypt_all(buffer_t *cipher, int method, int auth, size_t capacity)
             return -1;
         }
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
         dump("PLAIN", plain->array, plain->len);
         dump("CIPHER", cipher->array + iv_len, cipher->len - iv_len);
 #endif
@@ -1431,7 +1431,7 @@ int ss_decrypt(buffer_t *cipher, enc_ctx_t *ctx, size_t capacity)
             return -1;
         }
 
-#ifdef DEBUG
+#ifdef SS_DEBUG
         dump("PLAIN", plain->array, plain->len);
         dump("CIPHER", cipher->array + iv_len, cipher->len - iv_len);
 #endif

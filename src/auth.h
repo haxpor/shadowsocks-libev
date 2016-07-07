@@ -23,6 +23,8 @@
 #ifndef _AUTH_H
 #define _AUTH_H
 
+#include <obfs.h>
+
 void * auth_simple_init_data();
 obfs * auth_simple_new_obfs();
 void auth_simple_dispose(obfs *self);
@@ -33,5 +35,8 @@ int auth_simple_client_post_decrypt(obfs *self, char **pplaindata, int datalengt
 
 int auth_sha1_client_pre_encrypt(obfs *self, char **pplaindata, int datalength, size_t* capacity);
 int auth_sha1_client_post_decrypt(obfs *self, char **pplaindata, int datalength, size_t* capacity);
+
+int auth_sha1_v2_client_pre_encrypt(obfs *self, char **pplaindata, int datalength, size_t* capacity);
+int auth_sha1_v2_client_post_decrypt(obfs *self, char **pplaindata, int datalength, size_t* capacity);
 
 #endif // _AUTH_H

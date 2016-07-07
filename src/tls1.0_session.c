@@ -1,5 +1,6 @@
-
+#include <stdlib.h>
 #include "tls1.0_session.h"
+#include "encrypt.h"
 
 typedef struct tls10_session_auth_global_data {
     uint8_t local_client_id[32];

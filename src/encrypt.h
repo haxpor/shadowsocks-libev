@@ -196,4 +196,6 @@ int balloc(buffer_t *ptr, size_t capacity);
 int brealloc(buffer_t *ptr, size_t len, size_t capacity);
 void bfree(buffer_t *ptr);
 
+int rand_bytes(uint8_t *output, int len);
+
 #endif // _ENCRYPT_H

@@ -23,6 +23,8 @@
 #ifndef _TLS1_0_SESSION_H
 #define _TLS1_0_SESSION_H
 
+#include <obfs.h>
+
 void * tls10_session_auth_init_data();
 obfs * tls10_session_auth_new_obfs();
 void tls10_session_auth_dispose(obfs *self);

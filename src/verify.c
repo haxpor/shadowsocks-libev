@@ -1,5 +1,7 @@
-
+#include <stdlib.h>
+#include <string.h>
 #include "verify.h"
+#include "crc32.h"
 
 static int verify_simple_pack_unit_size = 2000;
 

@@ -88,8 +88,6 @@ ev_tstamp last = 0;
 char *prefix;
 #endif
 
-#include "obfs.c" // I don't want to modify makefile
-
 static int acl = 0;
 static int mode = TCP_ONLY;
 
@@ -1448,6 +1446,9 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     int remote_port   = profile.remote_port;
     int local_port    = profile.local_port;
     int timeout       = profile.timeout;
+    char *protocol    = profile.protocol; // SSR
+    char *obfs        = profile.obfs; // SSR
+    char *obfs_param  = profile.obfs_param; // SSR
 
     auth      = profile.auth;
     mode      = profile.mode;
@@ -1497,13 +1498,25 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     // Setup proxy context
     struct ev_loop *loop = EV_DEFAULT;
     listen_ctx_t listen_ctx;
+    int remote_num = 1;
 
-    listen_ctx.remote_num     = 1;
+    listen_ctx.remote_num     = remote_num;
     listen_ctx.remote_addr    = malloc(sizeof(struct sockaddr *));
     listen_ctx.remote_addr[0] = (struct sockaddr *)storage;
     listen_ctx.timeout        = timeout;
     listen_ctx.method         = m;
     listen_ctx.iface          = NULL;
+
+    // SSR beg
+    listen_ctx.protocol_name = protocol;
+    listen_ctx.method = m;
+    listen_ctx.obfs_name = obfs;
+    listen_ctx.obfs_param = obfs_param;
+    listen_ctx.list_protocol_global = malloc(sizeof(void *) * remote_num);
+    listen_ctx.list_obfs_global = malloc(sizeof(void *) * remote_num);
+    memset(listen_ctx.list_protocol_global, 0, sizeof(void *) * remote_num);
+    memset(listen_ctx.list_obfs_global, 0, sizeof(void *) * remote_num);
+    // SSR end
 
     // Setup socket
     int listenfd;
@@ -1553,6 +1566,21 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     ev_io_stop(loop, &listen_ctx.io);
     free_connections(loop);
     close(listen_ctx.fd);
+
+    for (int i = 0; i < remote_num; i++) {
+        free(listen_ctx.remote_addr[i]);
+        //*
+        if (listen_ctx.list_protocol_global[i]) {
+            free(listen_ctx.list_protocol_global[i]);
+            listen_ctx.list_protocol_global[i] = NULL;
+        }
+        if (listen_ctx.list_obfs_global[i]) {
+            free(listen_ctx.list_obfs_global[i]);
+            listen_ctx.list_obfs_global[i] = NULL;
+        }// */
+    }
+    free(listen_ctx.list_protocol_global); // SSR
+    free(listen_ctx.list_obfs_global); // SSR
 
     free(listen_ctx.remote_addr);
 
