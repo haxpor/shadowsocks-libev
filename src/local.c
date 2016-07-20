@@ -1237,6 +1237,9 @@ int main(int argc, char **argv)
         if (protocol == NULL) {
             protocol = conf->protocol;
             LOGI("protocol %s", protocol);
+            if (protocol != NULL && strcmp(protocol, "verify_sha1") == 0) {
+                auth = 1;
+            }
         }
         if (method == NULL) {
             method = conf->method;
@@ -1451,6 +1454,9 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     char *obfs_param  = profile.obfs_param; // SSR
 
     auth      = profile.auth;
+    if (protocol != NULL && strcmp(protocol, "verify_sha1") == 0) {
+        auth = 1;
+    }
     mode      = profile.mode;
     fast_open = profile.fast_open;
     verbose   = profile.verbose;
