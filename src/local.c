@@ -1615,22 +1615,6 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     free_connections(loop);
     close(listen_ctx.fd);
 
-<<<<<<< HEAD
-    for (int i = 0; i < remote_num; i++) {
-        free(listen_ctx.remote_addr[i]);
-        //*
-        if (listen_ctx.list_protocol_global[i]) {
-            free(listen_ctx.list_protocol_global[i]);
-            listen_ctx.list_protocol_global[i] = NULL;
-        }
-        if (listen_ctx.list_obfs_global[i]) {
-            free(listen_ctx.list_obfs_global[i]);
-            listen_ctx.list_obfs_global[i] = NULL;
-        }// */
-    }
-    free(listen_ctx.list_protocol_global); // SSR
-    free(listen_ctx.list_obfs_global); // SSR
-
     ss_free(listen_ctx.remote_addr);
 
 #ifdef __MINGW32__
