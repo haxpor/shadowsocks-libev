@@ -4,6 +4,9 @@
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
 
+/* errno for incomplete non-blocking connect(2) */
+#define CONNECT_IN_PROGRESS EINPROGRESS
+
 /* Override libev default fd conversion macro. */
 /* #undef EV_FD_TO_WIN32_HANDLE */
 
@@ -67,6 +70,9 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
+
+/* Enable IPv6 support in libudns */
+#define HAVE_IPv6 1
 
 /* Define to 1 if you have the `kqueue' function. */
 #define HAVE_KQUEUE 1
@@ -269,7 +275,7 @@
 #define PACKAGE_NAME "shadowsocks-libev"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "shadowsocks-libev 2.4.5"
+#define PACKAGE_STRING "shadowsocks-libev 2.4.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "shadowsocks-libev"
@@ -278,7 +284,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.4.5"
+#define PACKAGE_VERSION "2.4.8"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -340,7 +346,7 @@
 
 
 /* Version number of package */
-#define VERSION "2.4.5"
+#define VERSION "2.4.8"
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
