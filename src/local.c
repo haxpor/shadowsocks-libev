@@ -1574,6 +1574,7 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     struct sockaddr_storage *storage = ss_malloc(sizeof(struct sockaddr_storage));
     memset(storage, 0, sizeof(struct sockaddr_storage));
     if (get_sockaddr(remote_host, remote_port_str, storage, 1) == -1) {
+        cb(0, data);
         return -1;
     }
 
@@ -1581,6 +1582,7 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     struct ev_loop *loop = EV_DEFAULT;
     listen_ctx_t listen_ctx;
     int remote_num = 1;
+
     listen_ctx.remote_num     = 1;
     listen_ctx.remote_addr    = ss_malloc(sizeof(struct sockaddr *));
     listen_ctx.remote_addr[0] = (struct sockaddr *)storage;
@@ -1589,37 +1591,19 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     listen_ctx.iface          = NULL;
     listen_ctx.mptcp          = mptcp;
 
-//<<<<<<< HEAD
-//    // SSR beg
-//    listen_ctx.protocol_name = protocol;
-//    listen_ctx.method = m;
-//    listen_ctx.obfs_name = obfs;
-//    listen_ctx.obfs_param = obfs_param;
-//    listen_ctx.list_protocol_global = malloc(sizeof(void *) * remote_num);
-//    listen_ctx.list_obfs_global = malloc(sizeof(void *) * remote_num);
-//    memset(listen_ctx.list_protocol_global, 0, sizeof(void *) * remote_num);
-//    memset(listen_ctx.list_obfs_global, 0, sizeof(void *) * remote_num);
-//    // SSR end
-//
-//    // Setup socket
-//    int listenfd;
-//    listenfd = create_and_bind(local_addr, local_port_str);
-//    if (listenfd < 0) {
-//        ERROR("bind()");
-//        return -1;
-//    }
-//    if (listen(listenfd, SOMAXCONN) == -1) {
-//        ERROR("listen()");
-//        return -1;
-//    }
-//    setnonblocking(listenfd);
-//
-//    cb(listenfd, data);
-//
-//    listen_ctx.fd = listenfd;
-//=======
-    if (mode != UDP_ONLY) {
+    // SSR beg
+    listen_ctx.fd = 0;
+    listen_ctx.protocol_name = protocol;
+    listen_ctx.method = m;
+    listen_ctx.obfs_name = obfs;
+    listen_ctx.obfs_param = obfs_param;
+    listen_ctx.list_protocol_global = malloc(sizeof(void *) * remote_num);
+    listen_ctx.list_obfs_global = malloc(sizeof(void *) * remote_num);
+    memset(listen_ctx.list_protocol_global, 0, sizeof(void *) * remote_num);
+    memset(listen_ctx.list_obfs_global, 0, sizeof(void *) * remote_num);
+    // SSR end
 
+    if (mode != UDP_ONLY) {
         // Setup socket
         int listenfd;
         listenfd = create_and_bind(local_addr, local_port_str);
@@ -1632,7 +1616,6 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
             return -1;
         }
         setnonblocking(listenfd);
-//>>>>>>> upstream/master
 
         listen_ctx.fd = listenfd;
 
@@ -1652,6 +1635,8 @@ int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
 
     // Init connections
     cork_dllist_init(&connections);
+
+    cb(listen_ctx.fd, data);
 
     // Enter the loop
     ev_run(loop, 0);
