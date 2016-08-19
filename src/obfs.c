@@ -43,6 +43,10 @@ void set_server_info(obfs *self, server_info *server) {
     memmove(&self->server, server, sizeof(server_info));
 }
 
+void get_server_info(obfs *self, server_info *server) {
+    memmove(server, &self->server, sizeof(server_info));
+}
+
 void dispose_obfs(obfs *self) {
     free(self);
 }
@@ -60,6 +64,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = init_data;
         plugin->new_obfs = http_simple_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = http_simple_dispose;
 
@@ -71,6 +76,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = tls12_ticket_auth_init_data;
         plugin->new_obfs = tls12_ticket_auth_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = tls12_ticket_auth_dispose;
 
@@ -82,6 +88,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = init_data;
         plugin->new_obfs = verify_simple_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = verify_simple_dispose;
 
@@ -93,6 +100,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = auth_simple_init_data;
         plugin->new_obfs = auth_simple_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = auth_simple_dispose;
 
@@ -104,6 +112,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = auth_simple_init_data;
         plugin->new_obfs = auth_simple_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = auth_simple_dispose;
 
@@ -115,6 +124,7 @@ obfs_class * new_obfs_class(char *plugin_name)
         obfs_class * plugin = (obfs_class*)malloc(sizeof(obfs));
         plugin->init_data = auth_simple_init_data;
         plugin->new_obfs = auth_simple_new_obfs;
+        plugin->get_server_info = get_server_info;
         plugin->set_server_info = set_server_info;
         plugin->dispose = auth_simple_dispose;
 
