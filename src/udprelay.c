@@ -104,7 +104,8 @@ static int server_num                                = 0;
 static server_ctx_t *server_ctx_list[MAX_REMOTE_NUM] = { NULL };
 
 #ifndef __MINGW32__
-static int setnonblocking(int fd)
+static int
+setnonblocking(int fd)
 {
     int flags;
     if (-1 == (flags = fcntl(fd, F_GETFL, 0))) {
@@ -116,7 +117,8 @@ static int setnonblocking(int fd)
 #endif
 
 #if defined(MODULE_REMOTE) && defined(SO_BROADCAST)
-static int set_broadcast(int socket_fd)
+static int
+set_broadcast(int socket_fd)
 {
     int opt = 1;
     return setsockopt(socket_fd, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
@@ -125,7 +127,8 @@ static int set_broadcast(int socket_fd)
 #endif
 
 #ifdef SO_NOSIGPIPE
-static int set_nosigpipe(int socket_fd)
+static int
+set_nosigpipe(int socket_fd)
 {
     int opt = 1;
     return setsockopt(socket_fd, SOL_SOCKET, SO_NOSIGPIPE, &opt, sizeof(opt));
@@ -143,7 +146,8 @@ static int set_nosigpipe(int socket_fd)
 #define IP_RECVORIGDSTADDR   20
 #endif
 
-static int get_dstaddr(struct msghdr *msg, struct sockaddr_storage *dstaddr)
+static int
+get_dstaddr(struct msghdr *msg, struct sockaddr_storage *dstaddr)
 {
     struct cmsghdr *cmsg;
 
@@ -165,7 +169,8 @@ static int get_dstaddr(struct msghdr *msg, struct sockaddr_storage *dstaddr)
 #endif
 
 #define HASH_KEY_LEN sizeof(struct sockaddr_storage) + sizeof(int)
-static char *hash_key(const int af, const struct sockaddr_storage *addr)
+static char *
+hash_key(const int af, const struct sockaddr_storage *addr)
 {
     size_t addr_len = sizeof(struct sockaddr_storage);
     static char key[HASH_KEY_LEN];
@@ -178,8 +183,9 @@ static char *hash_key(const int af, const struct sockaddr_storage *addr)
 }
 
 #if defined(MODULE_REDIR) || defined(MODULE_REMOTE)
-static int construct_udprealy_header(const struct sockaddr_storage *in_addr,
-                                     char *addr_header)
+static int
+construct_udprealy_header(const struct sockaddr_storage *in_addr,
+                          char *addr_header)
 {
     int addr_header_len = 0;
     if (in_addr->ss_family == AF_INET) {
@@ -206,16 +212,12 @@ static int construct_udprealy_header(const struct sockaddr_storage *in_addr,
 
 #endif
 
-static int parse_udprealy_header(const char *buf, const size_t buf_len,
-                                 int *auth, char *host, char *port,
-                                 struct sockaddr_storage *storage)
+static int
+parse_udprealy_header(const char *buf, const size_t buf_len,
+                      char *host, char *port, struct sockaddr_storage *storage)
 {
     const uint8_t atyp = *(uint8_t *)buf;
     int offset         = 1;
-
-    if (auth != NULL) {
-        *auth |= (atyp & ONETIMEAUTH_FLAG);
-    }
 
     // get remote addr and port
     if ((atyp & ADDRTYPE_MASK) == 1) {
@@ -292,7 +294,8 @@ static int parse_udprealy_header(const char *buf, const size_t buf_len,
     return offset;
 }
 
-static char *get_addr_str(const struct sockaddr *sa)
+static char *
+get_addr_str(const struct sockaddr *sa)
 {
     static char s[SS_ADDRSTRLEN];
     memset(s, 0, SS_ADDRSTRLEN);
@@ -328,7 +331,8 @@ static char *get_addr_str(const struct sockaddr *sa)
     return s;
 }
 
-int create_remote_socket(int ipv6)
+int
+create_remote_socket(int ipv6)
 {
     int remote_sock;
 
@@ -369,7 +373,8 @@ int create_remote_socket(int ipv6)
     return remote_sock;
 }
 
-int create_server_socket(const char *host, const char *port)
+int
+create_server_socket(const char *host, const char *port)
 {
     struct addrinfo hints;
     struct addrinfo *result, *rp, *ipv4v6bindall;
@@ -465,7 +470,8 @@ int create_server_socket(const char *host, const char *port)
     return server_sock;
 }
 
-remote_ctx_t *new_remote(int fd, server_ctx_t *server_ctx)
+remote_ctx_t *
+new_remote(int fd, server_ctx_t *server_ctx)
 {
     remote_ctx_t *ctx = ss_malloc(sizeof(remote_ctx_t));
     memset(ctx, 0, sizeof(remote_ctx_t));
@@ -480,7 +486,8 @@ remote_ctx_t *new_remote(int fd, server_ctx_t *server_ctx)
     return ctx;
 }
 
-server_ctx_t *new_server_ctx(int fd)
+server_ctx_t *
+new_server_ctx(int fd)
 {
     server_ctx_t *ctx = ss_malloc(sizeof(server_ctx_t));
     memset(ctx, 0, sizeof(server_ctx_t));
@@ -493,7 +500,8 @@ server_ctx_t *new_server_ctx(int fd)
 }
 
 #ifdef MODULE_REMOTE
-struct query_ctx *new_query_ctx(char *buf, size_t len)
+struct query_ctx *
+new_query_ctx(char *buf, size_t len)
 {
     struct query_ctx *ctx = ss_malloc(sizeof(struct query_ctx));
     memset(ctx, 0, sizeof(struct query_ctx));
@@ -504,7 +512,8 @@ struct query_ctx *new_query_ctx(char *buf, size_t len)
     return ctx;
 }
 
-void close_and_free_query(EV_P_ struct query_ctx *ctx)
+void
+close_and_free_query(EV_P_ struct query_ctx *ctx)
 {
     if (ctx != NULL) {
         if (ctx->query != NULL) {
@@ -521,7 +530,8 @@ void close_and_free_query(EV_P_ struct query_ctx *ctx)
 
 #endif
 
-void close_and_free_remote(EV_P_ remote_ctx_t *ctx)
+void
+close_and_free_remote(EV_P_ remote_ctx_t *ctx)
 {
     if (ctx != NULL) {
         ev_timer_stop(EV_A_ & ctx->watcher);
@@ -531,7 +541,8 @@ void close_and_free_remote(EV_P_ remote_ctx_t *ctx)
     }
 }
 
-static void remote_timeout_cb(EV_P_ ev_timer *watcher, int revents)
+static void
+remote_timeout_cb(EV_P_ ev_timer *watcher, int revents)
 {
     remote_ctx_t *remote_ctx = (remote_ctx_t *)(((void *)watcher)
                                                 - sizeof(ev_io));
@@ -545,7 +556,8 @@ static void remote_timeout_cb(EV_P_ ev_timer *watcher, int revents)
 }
 
 #ifdef MODULE_REMOTE
-static void query_resolve_cb(struct sockaddr *addr, void *data)
+static void
+query_resolve_cb(struct sockaddr *addr, void *data)
 {
     struct query_ctx *query_ctx = (struct query_ctx *)data;
     struct ev_loop *loop        = query_ctx->server_ctx->loop;
@@ -632,7 +644,8 @@ static void query_resolve_cb(struct sockaddr *addr, void *data)
 
 #endif
 
-static void remote_recv_cb(EV_P_ ev_io *w, int revents)
+static void
+remote_recv_cb(EV_P_ ev_io *w, int revents)
 {
     ssize_t r;
     remote_ctx_t *remote_ctx = (remote_ctx_t *)w;
@@ -674,10 +687,26 @@ static void remote_recv_cb(EV_P_ ev_io *w, int revents)
         goto CLEAN_UP;
     }
 
+    //SSR beg
+    if (server_ctx->protocol_plugin) {
+        obfs_class *protocol_plugin = server_ctx->protocol_plugin;
+        if (protocol_plugin->client_udp_post_decrypt) {
+            buf->len = protocol_plugin->client_udp_post_decrypt(server_ctx->protocol, &buf->array, buf->len, &buf->capacity);
+            if ((int)buf->len < 0) {
+                LOGE("client_udp_post_decrypt");
+                close_and_free_remote(EV_A_ remote_ctx);
+                return;
+            }
+            if ( buf->len == 0 )
+                return;
+        }
+    }
+    // SSR end
+
 #ifdef MODULE_REDIR
     struct sockaddr_storage dst_addr;
     memset(&dst_addr, 0, sizeof(struct sockaddr_storage));
-    int len = parse_udprealy_header(buf->array, buf->len, NULL, NULL, NULL, &dst_addr);
+    int len = parse_udprealy_header(buf->array, buf->len, NULL, NULL, &dst_addr);
 
     if (dst_addr.ss_family != AF_INET && dst_addr.ss_family != AF_INET6) {
         LOGI("[udp] ss-redir does not support domain name");
@@ -692,7 +721,7 @@ static void remote_recv_cb(EV_P_ ev_io *w, int revents)
         LOGI("[udp] recv %s via %s", dst, src);
     }
 #else
-    int len = parse_udprealy_header(buf->array, buf->len, NULL, NULL, NULL, NULL);
+    int len = parse_udprealy_header(buf->array, buf->len, NULL, NULL, NULL);
 #endif
 
     if (len == 0) {
@@ -808,7 +837,8 @@ CLEAN_UP:
     ss_free(buf);
 }
 
-static void server_recv_cb(EV_P_ ev_io *w, int revents)
+static void
+server_recv_cb(EV_P_ ev_io *w, int revents)
 {
     server_ctx_t *server_ctx = (server_ctx_t *)w;
     struct sockaddr_storage src_addr;
@@ -1017,8 +1047,7 @@ static void server_recv_cb(EV_P_ ev_io *w, int revents)
     memset(&dst_addr, 0, sizeof(struct sockaddr_storage));
 
     int addr_header_len = parse_udprealy_header(buf->array + offset, buf->len - offset,
-                                                &server_ctx->auth, host, port,
-                                                &dst_addr);
+                                                host, port, &dst_addr);
     if (addr_header_len == 0) {
         // error in parse header
         goto CLEAN_UP;
@@ -1147,7 +1176,16 @@ static void server_recv_cb(EV_P_ ev_io *w, int revents)
         buf->array[0] |= ONETIMEAUTH_FLAG;
     }
 
-    int err = ss_encrypt_all(buf, server_ctx->method, server_ctx->auth, buf_size);
+    // SSR beg
+    if (server_ctx->protocol_plugin) {
+        obfs_class *protocol_plugin = server_ctx->protocol_plugin;
+        if (protocol_plugin->client_udp_pre_encrypt) {
+            buf->len = protocol_plugin->client_udp_pre_encrypt(server_ctx->protocol, &buf->array, buf->len, &buf->capacity);
+        }
+    }
+    //SSR end
+
+    int err = ss_encrypt_all(buf, server_ctx->method, server_ctx->auth, buf->len);
 
     if (err) {
         // drop the packet silently
@@ -1277,7 +1315,8 @@ CLEAN_UP:
     ss_free(buf);
 }
 
-void free_cb(void *element)
+void
+free_cb(void *element)
 {
     remote_ctx_t *remote_ctx = (remote_ctx_t *)element;
 
@@ -1288,14 +1327,15 @@ void free_cb(void *element)
     close_and_free_remote(EV_DEFAULT, remote_ctx);
 }
 
-int init_udprelay(const char *server_host, const char *server_port,
+int
+init_udprelay(const char *server_host, const char *server_port,
 #ifdef MODULE_LOCAL
-                  const struct sockaddr *remote_addr, const int remote_addr_len,
+              const struct sockaddr *remote_addr, const int remote_addr_len,
 #ifdef MODULE_TUNNEL
-                  const ss_addr_t tunnel_addr,
+              const ss_addr_t tunnel_addr,
 #endif
 #endif
-                  int mtu, int method, int auth, int timeout, const char *iface)
+              int mtu, int method, int auth, int timeout, const char *iface, const char *protocol)
 {
     // Initialize ev loop
     struct ev_loop *loop = EV_DEFAULT;
@@ -1319,6 +1359,10 @@ int init_udprelay(const char *server_host, const char *server_port,
         FATAL("[udp] bind() error");
     }
     setnonblocking(serverfd);
+    if (protocol != NULL && strcmp(protocol, "verify_sha1") == 0) {
+        auth = 1;
+        protocol = NULL;
+    }
 
     server_ctx_t *server_ctx = new_server_ctx(serverfd);
 #ifdef MODULE_REMOTE
@@ -1332,6 +1376,25 @@ int init_udprelay(const char *server_host, const char *server_port,
 #ifdef MODULE_LOCAL
     server_ctx->remote_addr     = remote_addr;
     server_ctx->remote_addr_len = remote_addr_len;
+    //SSR beg
+    server_ctx->protocol_plugin = new_obfs_class((char *)protocol);
+    if (server_ctx->protocol_plugin) {
+        server_ctx->protocol = server_ctx->protocol_plugin->new_obfs();
+        server_ctx->protocol_global = server_ctx->protocol_plugin->init_data();
+    }
+
+    server_info _server_info;
+    memset(&_server_info, 0, sizeof(server_info));
+    strcpy(_server_info.host, inet_ntoa(((struct sockaddr_in*)remote_addr)->sin_addr));
+    _server_info.port = ((struct sockaddr_in*)remote_addr)->sin_port;
+    _server_info.port = _server_info.port >> 8 | _server_info.port << 8;
+    _server_info.g_data = server_ctx->protocol_global;
+    _server_info.key = enc_get_key();
+    _server_info.key_len = enc_get_key_len();
+
+    if (server_ctx->protocol_plugin)
+        server_ctx->protocol_plugin->set_server_info(server_ctx->protocol, &_server_info);
+    //SSR end
 #ifdef MODULE_TUNNEL
     server_ctx->tunnel_addr = tunnel_addr;
 #endif
@@ -1344,11 +1407,24 @@ int init_udprelay(const char *server_host, const char *server_port,
     return 0;
 }
 
-void free_udprelay()
+void
+free_udprelay()
 {
     struct ev_loop *loop = EV_DEFAULT;
     while (server_num-- > 0) {
         server_ctx_t *server_ctx = server_ctx_list[server_num];
+
+#ifdef MODULE_LOCAL
+        //SSR beg
+        if (server_ctx->protocol_plugin) {
+            server_ctx->protocol_plugin->dispose(server_ctx->protocol);
+            server_ctx->protocol = NULL;
+            free_obfs_class(server_ctx->protocol_plugin);
+            server_ctx->protocol_plugin = NULL;
+        }
+        //SSR end
+#endif
+
         ev_io_stop(loop, &server_ctx->io);
         close(server_ctx->fd);
         cache_delete(server_ctx->conn_cache, 0);

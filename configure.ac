@@ -2,7 +2,7 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([shadowsocks-libev], [2.4.8], [max.c.lv@gmail.com])
+AC_INIT([shadowsocks-libev], [2.5.6], [max.c.lv@gmail.com])
 AC_CONFIG_SRCDIR([src/encrypt.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR(auto)
@@ -19,6 +19,12 @@ dnl Checks for lib
 AC_DISABLE_STATIC
 AC_DISABLE_SHARED
 LT_INIT([dlopen])
+
+dnl Check for pcre library
+TS_CHECK_PCRE
+if test "x${enable_pcre}" != "xyes"; then
+  AC_MSG_ERROR([Cannot find pcre library. Configure --with-pcre=DIR])
+fi
 
 dnl Checks for using shared libraries from system
 AC_ARG_ENABLE(
@@ -52,8 +58,10 @@ AC_ARG_ENABLE([documentation],
 AM_CONDITIONAL([ENABLE_DOCUMENTATION], [test x$disable_documentation = xfalse])
 
 AM_COND_IF([ENABLE_DOCUMENTATION], [
-  AC_PATH_PROG([ASCIIDOC], [asciidoc], [asciidoc])
-  AC_PATH_PROG([XMLTO], [xmlto], [xmlto])
+  AC_PATH_PROG([ASCIIDOC], [asciidoc])
+  test x"${ASCIIDOC}" != x || AC_MSG_ERROR([Cannot find `asciidoc` in PATH.]) 
+  AC_PATH_PROG([XMLTO], [xmlto])
+  test x"$XMLTO" != x || AC_MSG_ERROR([Cannot find `xmlto` in PATH.]) 
   AC_PATH_PROG([GZIP], [gzip], [gzip])
   AC_PATH_PROG([RM], [rm], [rm])
   AC_PATH_PROG([MV], [mv], [mv])
